@@ -1,14 +1,26 @@
 apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-whoami-prefix
+  namespace: default
+spec:
+  stripPrefix:
+    prefixes:
+      - /whoami
+---
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: whoami-route
+  name: nginx-whoami-route
   namespace: default
 spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`whoami.localhost`)
+    - match: Host(`localhost`) && PathPrefix(`/whoami`)
       kind: Rule
+      middlewares:
+        - name: strip-whoami-prefix
       services:
-        - name: whoami
+        - name: nginx-whoami
           port: 80
