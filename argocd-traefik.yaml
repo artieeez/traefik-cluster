@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: traefik
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: traefik
+    repoURL: https://traefik.github.io/charts
+    targetRevision: 33.0.0  # Explicitly pinning v3 version
+    helm:
+      values: |
+        ingressClass:
+          enabled: true
+          isDefaultClass: true
+        ports:
+          web:
+            hostPort: 80
+          websecure:
+            hostPort: 443
+        service:
+          type: ClusterIP # We don't need NodePort if we use hostPort on the Pod
+        deployment:
+          kind: DaemonSet
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: traefik
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
