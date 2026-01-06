@@ -1,0 +1,3 @@
+- argocd install is simpler
+- traefik version is newer
+- traefik.containo.us > traefik.io
